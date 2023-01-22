@@ -1,21 +1,23 @@
-FROM rasa/rasa:latest-full 
+# use a python container as a starting point
+FROM python:3.7-slim
 
-USER root
+# install dependencies of interest
+RUN python -m pip install rasa
 
+# set workdir and copy data files from disk
+# note the latter command uses .dockerignore
 WORKDIR /app
-COPY . /app
-COPY ./data /app/data
-RUN sudo pip3 install --upgrade pip --user
-RUN sudo pip3 install nltk
-RUN sudo rasa train
+ENV HOME=/app
+COPY . .
 
-# Switch back to a non-root user
+# train a new rasa model
+RUN rasa train nlu
+
+# set the user to run, don't run as root
 USER 1001
 
-VOLUME /app
-VOLUME /app/data
-VOLUME /app/models
-VOLUME /app/external_data
+# set entrypoint for interactive shells
+ENTRYPOINT ["rasa"]
 
-
-CMD [ "run","-m","/app/models","--enable-api","--cors","*","--debug"]
+# command to run when container is called to run
+CMD ["run", "--enable-api", "--port", "8080"]
