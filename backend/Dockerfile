@@ -5,7 +5,6 @@ USER root
 WORKDIR /app
 COPY . /app
 COPY ./data /app/data
-COPY ./external_data /app/external_data
 RUN pip3 install --upgrade pip --user
 RUN pip3 install nltk
 RUN  python3 -m rasa train
